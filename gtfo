@@ -9,11 +9,13 @@ MSG="""
  \___  (____  /__|   (____  / \____ | |__|\___  >__|_ \\
      \/     \/            \/       \/         \/     \/
 """
+#source $(dirname $0)/ascii
+source ./ascii
 
 while : ; do
     for dude in $(who |cut -f1 -d " " |uniq); do
 	if [ $dude != $USER ]; then
-            echo "${MSG}" |write $dude 2>/dev/null
+            echo "$(rando)" |write $dude 2>/dev/null
 	    sudo killall -u $dude
 	    echo "kill't $dude"
 	fi

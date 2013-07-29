@@ -23,10 +23,12 @@ GTFO="""
       \/     \/      \/     \/     \/           \/     \/    \/     \/     \/ 
 """
 
-rando() {
-    OPTS=(DIK GTFO)
-    echo ${OPTS[$RANDOM%2]}
-}
+## must reflect the name and
+## number of messages
+OPTS=(DIK GTFO)
+NUM="${#OPTS[@]}"
 
-MSG=$(rando)
-echo "${!MSG}"
+rando() {
+    MSG="${OPTS[$RANDOM%${NUM}]}"
+    echo "${!MSG}"
+}
