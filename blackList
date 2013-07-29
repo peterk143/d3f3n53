@@ -1,0 +1,26 @@
+#!/bin/bash
+
+## RFE::
+# 0. backup /etc/passwd, if it ever
+#     changes, rm it & replace with backup
+# 1. disable root login
+# 2. check for immutables
+# 3. $(tee) where .bash_history goes
+# 4. who/when used sudo (auth.log)
+# 5. 
+
+# grep -v false /etc/passwd |cut -f1 -d ':'
+
+# passwd -l <user> // lock
+# passwd -u <user> // unlock
+# passwd -S <user> // status
+
+USERS="$(cut -d: -f 1 /etc/passwd)"
+for u in $USERS
+do
+    passwd -S $u | grep -Ew "NP" >/dev/null
+    if [ $? -eq 0 ]; then
+	echo $u
+	passwd -l $u
+    fi
+done
