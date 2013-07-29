@@ -24,12 +24,8 @@ GTFO="""
 """
 
 rando() {
-## output a random message
-
-OPTS=(DIK GTFO)
-
-#RPS=${OPTS[$RANDOM%2]}
-echo ${OPTS[$RANDOM%2]}
+    OPTS=(DIK GTFO)
+    echo ${OPTS[$RANDOM%2]}
 }
 
 MSG=$(rando)
