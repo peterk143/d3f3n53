@@ -12,10 +12,10 @@ MSG="""
 
 while : ; do
     for dude in $(who |cut -f1 -d " " |uniq); do
-    if [ $dude != $USER ]; then
-        echo "${MSG}" |write $dude 2>/dev/null
+	if [ $dude != $USER ]; then
+            echo "${MSG}" |write $dude 2>/dev/null
 	    sudo killall -u $dude
-	        echo "kill't $dude"
-		fi
+	    echo "kill't $dude"
+	fi
     done
 done
