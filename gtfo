@@ -2,15 +2,7 @@
 
 ## RFE:: should only echo the kill't person once
 
-MSG="""
-  ____ _____ _/  |_  _____      __| _/|__| ____ |  | __
- / __ \\\\__  \\\\   __\ \__  \    / __ | |  |/ ___\|  |/ /
-\  ___/ / __ \|  |    / __ \_ / /_/ | |  \  \___|    < 
- \___  (____  /__|   (____  / \____ | |__|\___  >__|_ \\
-     \/     \/            \/       \/         \/     \/
-"""
-#source $(dirname $0)/ascii
-source ./ascii
+source $(dirname $0)/ascii
 
 while : ; do
     for dude in $(who |cut -f1 -d " " |uniq); do
