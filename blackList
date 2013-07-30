@@ -14,6 +14,13 @@
 # passwd -u <user> // unlock
 # passwd -S <user> // status
 
+#am I root?
+if [ "$(id -u)" != "0" ]; then
+   echo "try sudo, br0" 1>&2
+   exit 1
+fi
+
+#null passwords, anyone?
 USERS="$(cut -d: -f 1 /etc/passwd)"
 for u in $USERS
 do
@@ -24,6 +31,7 @@ do
     fi
 done
 
+#no root login
 if [ -f /etc/ssh/sshd_config ]; then
     sed -ie 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
 fi
