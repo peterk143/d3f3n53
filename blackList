@@ -3,11 +3,10 @@
 ## RFE::
 # 0. backup /etc/passwd, if it ever
 #     changes, rm it & replace with backup
-# 1. disable root login
-# 2. check for immutables
-# 3. $(tee) where .bash_history goes
-# 4. who/when used sudo (auth.log)
-# 5. 
+# 1. check for immutables
+# 2. $(tee) where .bash_history goes
+# 3. who/when used sudo (auth.log)
+# 4. 
 
 # grep -v false /etc/passwd |cut -f1 -d ':'
 
@@ -24,3 +23,5 @@ do
 	passwd -l $u
     fi
 done
+
+sed -ie 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
