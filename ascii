@@ -238,9 +238,22 @@ DANCE="""
                                   ==\"    \`(0V0)    '--
 """
 
+SMILEY="""
+   , ; ,   .-'\"\"\"'-.   , ; ,
+   \\\\|/  .'         '.  \\|//
+    \\-;-/   ()   ()   \\-;-/
+    // ;               ; \\\\
+   //__; :.         .; ;__\\\\
+  \`-----\\'.'-.....-'.'/-----'
+         '.'.-.-,_.'.'
+           '(  (..-'
+             '-'
+"""
+
 ## must reflect the name and
 ## number of messages
-OPTS=(DIK GTFO DRAGON FUX FINGER SIMPSONS BOO SKULL BONES DUDES TERMINATOR DANCE)
+OPTS=(DIK GTFO DRAGON FUX FINGER SIMPSONS BOO \
+    SKULL BONES DUDES TERMINATOR DANCE SMILEY)
 NUM="${#OPTS[@]}"
 
 rando() {
