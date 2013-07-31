@@ -20,6 +20,18 @@ iptables -P OUTPUT DROP
 ## prevent DoS attack
 iptables -A INPUT -p tcp -m multiport --dports 22,80,443 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
 
+## force SYN packet check
+iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+## force fragments packet check
+iptables -A INPUT -f -j DROP
+
+## drop incoming malformed XMAS packets
+iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+
+## drop incoming malformed NULL packets
+iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+
 ## allow all incoming SSH, HTTP, HTTPS
 iptables -A INPUT -i eth0 -p tcp -m multiport --dports 22,80,443 -m --state NEW,ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -o eth0 -p tcp -m multiport--sports 22,80,443 -m state --state ESTABLISHED -j ACCEPT
@@ -67,3 +79,13 @@ iptables -A INPUT -p udp -i eth0 --sport 53 -j ACCEPT
 ## allow POP3/POP3S
 # iptables -A INPUT -i eth0 -p tcp -m multiport --dports 110,995 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 # iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports 110,995 -m state --state ESTABLISHED -j ACCEPT
+
+## port forwarding
+# iptables -t nat -A PREROUTING -p tcp -d 192.168.1.1 --dport 420 -j DNAT --to 192.168.1.2:22
+# iptables -A INPUT -i eth0 -p tcp --dport 420 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+# iptables -A OUTPUT -o eth0 -p tcp --sport 420 -m state --state ESTABLISHED -j ACCEPT
+
+iptables -N LOGGING
+iptables -A INPUT -j LOGGING
+iptables -A LOGGING -m limit --limit 2/min -j LOG --log-prefix "BitchAss Packet Dropped: " --log-level 7
+iptables -A LOGGING -j DROP
