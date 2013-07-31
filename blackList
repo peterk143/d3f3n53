@@ -19,5 +19,3 @@ if [ "$(id -u)" != "0" ]; then
    echo "try sudo, br0" 1>&2
    exit 1
 fi
-
-source $(dirname $0)/checkPasswds
