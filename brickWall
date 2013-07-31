@@ -1,0 +1,70 @@
+#!/bin/bash
+
+#am I root?
+if [ "$(id -u)" != "0" ]; then
+   echo "try sudo, br0" 1>&2
+   exit 1
+fi
+
+## delete existing rules
+iptables --flush
+
+## set default chain policies
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+# BLOCK_THIS_IP="x.x.x.x"
+# iptables -A INPUT -s "${BLOCK_THIS_IP}" -j DROP
+
+## allow all incoming SSH, HTTP, HTTPS
+iptables -A INPUT -i eth0 -p tcp -m multiport --dports 22,80,443 -m --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp -m multiport--sports 22,80,443 -m state --state ESTABLISHED -j ACCEPT
+
+## allow incoming SSH from specified
+# iptables -A INPUT -i eth0 -p tcp -s 192.168.1.0/24 --dport 22 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+# iptables -A OUTPUT -o eth0 -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
+
+## allow all outgoing SSH, HTTP, HTTPS
+iptables -A OUTPUT -o eth0 -p tcp -m multiport --dports 22,80,443 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp -m multiport --sports 22,80,443 -m state --state ESTABLISHED -j ACCEPT
+
+## allow outgoing SSH to specified
+# iptables -A OUTPUT -o eth0 -p tcp -d 192.168.1.0/24 --dport 22 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+# iptables -A INPUT -i eth0 -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
+
+## allow ping from outside to inside
+# iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+# iptables -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
+
+## allow ping from inside to outside
+# iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+# iptables -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
+
+## allow loopback access
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+## allow outbound DNS
+iptables -A OUTPUT -p udp -o eth0 --dport 53 -j ACCEPT
+iptables -A INPUT -p udp -i eth0 --sport 53 -j ACCEPT
+
+## allow MySQL connection from specified
+iptables -A INPUT -i eth0 -p tcp -s 192.168.1.0/24 --port 3306 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 3306 -m state --state ESTABLISHED -j ACCEPT
+
+## allow SENDMAIL/POSTFIX traffic
+# iptables -A INPUT -i eth0 -p tcp --dport 25 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+# iptables -A OUTPUT -o eth0 -p tcp --sport 25 -m state --state ESTABLISHED -j ACCEPT
+
+## allow IMAP/IMAPS
+iptables -A INPUT -i eth0 -p tcp -m multiport --dports 143,993 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports 143,993 -m state --state ESTABLISHED -j ACCEPT
+
+## allow POP3/POP3S
+iptables -A INPUT -i eth0 -p tcp -m multiport --dports 110,995 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports 110,995 -m state --state ESTABLISHED -j ACCEPT
+
+## prevent DoS attack
+iptables -A INPUT -p tcp -m multiport --dports 22,80,443 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
+
