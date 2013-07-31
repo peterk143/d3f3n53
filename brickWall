@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#am I root?
+## am I root?
 if [ "$(id -u)" != "0" ]; then
    echo "try sudo, br0" 1>&2
    exit 1
