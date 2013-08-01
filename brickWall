@@ -9,10 +9,16 @@ fi
 ## delete existing rules
 iptables --flush
 
-## set default chain policies
-iptables -P INPUT DROP
-iptables -P FORWARD DROP
-iptables -P OUTPUT DROP
+## set NORMAL default chain policies
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+## new chain to log and drop packets
+iptables -N LOGnDROP
+iptables -A LOGnDROP -j LOG --log-prefix \
+    'BitchAss Packed Dropped: ' --log-level 7
+iptables -A LOGnDROP -j DROP
 
 # BLOCK_THIS_IP="x.x.x.x"
 # iptables -A INPUT -s "${BLOCK_THIS_IP}" -j DROP
