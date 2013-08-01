@@ -20,8 +20,8 @@ iptables -A LOGnDROP -j DROP
 # iptables -A INPUT -s "${BLOCK_THIS_IP}" -j DROP
 
 ## prevent DoS attack
-iptables -A INPUT -p tcp -m multiport --dports \
-    22,80,443 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
+# iptables -A INPUT -i eth0 -p tcp -m multiport --dports \
+#     22,80,443 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
 
 ## allow loopback access
 iptables -A INPUT -i lo -j ACCEPT
@@ -40,7 +40,7 @@ iptables -A INPUT -i eth0 -p tcp -m multiport --sports \
     22,80,443 -m state --state ESTABLISHED -j ACCEPT
 
 ## allow incoming SSH from specified
-# iptables -A INPUT -i eth0 -p tcp -s 192.168.1.0/24 \
+# iptables -A INPUT -i eth0 -p tcp -s 71.61.223.37 \
 #     --dport 22 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 # iptables -A OUTPUT -o eth0 -p tcp --sport 22 -m state \
 #     --state ESTABLISHED -j ACCEPT
