@@ -16,8 +16,8 @@ iptables -P OUTPUT ACCEPT
 
 ## new chain to log and drop packets
 iptables -N LOGnDROP
-iptables -A LOGnDROP -j LOG --log-prefix \
-    'BitchAss Packed Dropped: ' --log-level 7
+iptables -A LOGnDROP -j LOG -m limit --limit 5/min \
+    --log-prefix 'BitchAss Packed Dropped: ' --log-level 7
 iptables -A LOGnDROP -j DROP
 
 # BLOCK_THIS_IP="x.x.x.x"
@@ -122,9 +122,3 @@ iptables -A INPUT -i eth0 -p tcp --dport 420 -m state \
     --state NEW,ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -o eth0 -p tcp --sport 420 -m state \
     --state ESTABLISHED -j ACCEPT
-
-iptables -N LOGGING
-iptables -A INPUT -j LOGGING
-iptables -A LOGGING -m limit --limit 2/min -j LOG --log-prefix \
-    "BitchAss Packet Dropped: " --log-level 7
-iptables -A LOGGING -j DROP
