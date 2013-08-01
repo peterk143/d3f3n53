@@ -44,3 +44,5 @@ if [ "$key" = "y" ]; then
 	    echo "${POLICY} policy unknown\n" ;;
     esac
 fi
+
+bash "${RULES}"
