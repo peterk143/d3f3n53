@@ -6,10 +6,10 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-RULES="$(dirname $0)/brickwall"
+RULES="$(dirname $0)/brickWall"
 # bash "{RULES}"
 
-echo "Current Policies/Defaults"
+echo -e "\nCurrent Policies/Defaults"
 iptables --list |grep policy
 echo ""
 
@@ -17,20 +17,20 @@ echo ""
 echo "ya testin' shit? [Y/n] "
 read -s -n 1 key
 if [ "$key" = "" -o "$key" = "y" ]; then
-    sed 's/DROP/REJECT/g' "${RULES}"
-    echo "ye shall be reject'd\n"
+    sed 's/DROP/REJECT/g' "${RULES}" &>/dev/null
+    echo -e "ye shall be reject'd\n"
 else
-    sed 's/REJECT/DROP/g' "${RULES}"
-    echo "gettin' dropped like a box of rocks\n"
+    sed 's/REJECT/DROP/g' "${RULES}" &>/dev/null
+    echo -e "gettin' dropped like a box of rocks\n"
 fi
 
 ## set default policies
 echo "Change Default Policies? [N/y] "
 read -s -n 1 key
 if [ "$key" = "y" ]; then
-    # POL="$(iptables --list |grep policy |cut -f4 -d " ")"
     POLICY="${$(iptables --list |grep policy |cut -f4 -d " ")%?}"
-    
+    echo "${POLICY}"
+
     case "${POLICY}" in 
 	ACCEPT) 
 	    iptables -P INPUT DROP
@@ -41,8 +41,10 @@ if [ "$key" = "y" ]; then
 	    iptables -P FORWARD ACCEPT
 	    iptables -P OUTPUT ACCEPT ;;
 	*)
-	    echo "${POLICY} policy unknown\n" ;;
+	    echo -e "\n${POLICY} policy unknown\n" ;;
     esac
+else
+    echo -e "fuck, shouldn't have made it here\n"
 fi
 
-bash "${RULES}"
+# bash "${RULES}"
