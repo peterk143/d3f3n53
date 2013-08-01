@@ -42,8 +42,9 @@ if [ "$key" = "y" ]; then
 	*)
 	    echo -e "\n${POLICY} policy unknown\n" ;;
     esac
-else
-    echo -e "fuck, shouldn't have made it here\n"
+elif [ "$key" != "" -o "$key" != "n" ]; then
+    echo -e "fuck, wrong input, br0\n"
+    exit 1
 fi
 
-# bash "${RULES}"
+bash "${RULES}"
