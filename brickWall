@@ -80,35 +80,51 @@ iptables -A OUTPUT -p udp -o eth0 --dport 53 -j ACCEPT
 iptables -A INPUT -p udp -i eth0 --sport 53 -j ACCEPT
 
 ## allow CIFS
-iptables -A INPUT -i eth0 -p tcp -m multiport --dports 137,138,139,445 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports 137,138,139,445 -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp -m multiport --dports \
+    137,138,139,445 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports \
+    137,138,139,445 -m state --state ESTABLISHED -j ACCEPT
 
 ## allow FTP
-iptables -A INPUT -i eth0 -p tcp --dport 21 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -o eth0 -p tcp --sport 21 -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --dport 21 -m state \
+    --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 21 -m state \
+    --state ESTABLISHED -j ACCEPT
 
 ## allow MySQL connection from specified
-iptables -A INPUT -i eth0 -p tcp -s 192.168.1.0/24 --port 3306 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -o eth0 -p tcp --sport 3306 -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp -s 192.168.1.0/24 --port 3306 \
+    -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 3306 -m state \
+    --state ESTABLISHED -j ACCEPT
 
 ## allow SENDMAIL/POSTFIX traffic (SMTP)
-iptables -A INPUT -i eth0 -p tcp --dport 25 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -o eth0 -p tcp --sport 25 -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --dport 25 -m state \
+    --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 25 -m state \
+    --state ESTABLISHED -j ACCEPT
 
 ## allow IMAP/IMAPS
-iptables -A INPUT -i eth0 -p tcp -m multiport --dports 143,993 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports 143,993 -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp -m multiport --dports \
+    143,993 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports \
+    143,993 -m state --state ESTABLISHED -j ACCEPT
 
 ## allow POP3/POP3S
-iptables -A INPUT -i eth0 -p tcp -m multiport --dports 110,995 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports 110,995 -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp -m multiport --dports \
+    110,995 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports \
+    110,995 -m state --state ESTABLISHED -j ACCEPT
 
 ## port forwarding
-iptables -t nat -A PREROUTING -p tcp -d 192.168.1.1 --dport 420 -j DNAT --to 192.168.1.2:22
-iptables -A INPUT -i eth0 -p tcp --dport 420 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -o eth0 -p tcp --sport 420 -m state --state ESTABLISHED -j ACCEPT
+iptables -t nat -A PREROUTING -p tcp -d 192.168.1.1 --dport \
+    420 -j DNAT --to 192.168.1.2:22
+iptables -A INPUT -i eth0 -p tcp --dport 420 -m state \
+    --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 420 -m state \
+    --state ESTABLISHED -j ACCEPT
 
 iptables -N LOGGING
 iptables -A INPUT -j LOGGING
-iptables -A LOGGING -m limit --limit 2/min -j LOG --log-prefix "BitchAss Packet Dropped: " --log-level 7
+iptables -A LOGGING -m limit --limit 2/min -j LOG --log-prefix \
+    "BitchAss Packet Dropped: " --log-level 7
 iptables -A LOGGING -j DROP
