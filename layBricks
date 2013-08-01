@@ -7,7 +7,6 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 RULES="$(dirname $0)/brickWall"
-# bash "{RULES}"
 
 echo -e "\nCurrent Policies/Defaults"
 iptables --list |grep policy
