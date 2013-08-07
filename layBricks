@@ -25,8 +25,8 @@ fi
 
 ## set default policies
 echo "Change Default Policies? [N/y] "
-read -s -n 1 key
-if [ "$key" = "y" ]; then
+read -s -n 1 key1
+if [ "$key1" = "y" ]; then
     POLICY="${$(iptables --list |grep policy |cut -f4 -d " ")%?}"
     echo "${POLICY}"
 
@@ -42,7 +42,7 @@ if [ "$key" = "y" ]; then
 	*)
 	    echo -e "\n${POLICY} policy unknown\n" ;;
     esac
-elif [ "$key" != "" -o "$key" != "n" ]; then
+elif [ "$key1" != "" -o "$key" != "n" ]; then
     echo -e "fuck, wrong input, br0\n"
     exit 1
 fi
