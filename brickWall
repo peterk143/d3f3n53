@@ -29,7 +29,7 @@ iptables -A OUTPUT -o lo -j ACCEPT
 
 ## allow all incoming SSH, HTTP, HTTPS
 iptables -A INPUT -i eth0 -p tcp -m multiport --dports \
-    22,80,443 -m --state NEW,ESTABLISHED,RELATED -j ACCEPT
+    22,80,443 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports \
     22,80,443 -m state --state ESTABLISHED -j ACCEPT
 
