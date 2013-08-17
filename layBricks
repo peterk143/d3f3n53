@@ -2,8 +2,8 @@
 
 ## am I root?
 if [ "$(id -u)" != "0" ]; then
-   echo "try sudo, br0" 1>&2
-   exit 1
+    echo "try sudo, br0" 1>&2
+    exit 1
 fi
 
 RULES="$(dirname $0)/brickWall"
@@ -12,40 +12,43 @@ echo -e "\nCurrent Policies/Defaults"
 iptables --list |grep policy
 echo ""
 
-## debugging
-echo "ya testin' shit? [Y/n] "
-read -s -n 1 key
-if [ "$key" = "" -o "$key" = "y" ]; then
-    sed 's/DROP/REJECT/g' "${RULES}" &>/dev/null
-    echo -e "ye shall be reject'd\n"
-else
-    sed 's/REJECT/DROP/g' "${RULES}" &>/dev/null
-    echo -e "gettin' dropped like a box of rocks\n"
-fi
-
 ## set default policies
 echo "Change Default Policies? [N/y] "
 read -s -n 1 key1
 if [ "$key1" = "y" ]; then
-    echo "EAT SHIT DUDE, you said YES"
-    POLICY="${$(iptables --list |grep policy |cut -f4 -d " ")%?}" ## doesn't work
-    echo "${POLICY}"
+    echo -e "\nAccept || Drop [A/d] "
+    read -s -n 1 key2
 
-    case "${POLICY}" in 
-	ACCEPT) 
-	    iptables -P INPUT DROP
-	    iptables -P FORWARD DROP
-	    iptables -P OUTPUT DROP ;;
-	DROP) 
-	    iptables -P INPUT ACCEPT
-	    iptables -P FORWARD ACCEPT
-	    iptables -P OUTPUT ACCEPT ;;
+    case "${key2}" in 
+	"" |a |A) 
+	echo -e " go on thru'\n"
+	iptables -P INPUT ACCEPT
+	iptables -P FORWARD ACCEPT
+	iptables -P OUTPUT ACCEPT ;;
+	d |D)
+	echo -e " you shall not pass\n"
+	iptables -P INPUT DROP
+	iptables -P FORWARD DROP
+	iptables -P OUTPUT DROP ;;
 	*)
-	    echo -e "\n${POLICY} policy unknown\n" ;;
+	    echo -e "\n input policy unknown\n" ;;
     esac
-elif [ "$key1" != "" -o "$key" != "n" ]; then
-    echo -e "fuck, wrong input, br0\n"
+elif [ "$key1" = "" -o "$key" = "n" ]; then
+    echo -e " ain't doin' shit\n"
+else
+    echo -e " you fuk't up\n"
     exit 1
+fi
+
+## debugging
+echo "ya testin' shit? [Y/n] "
+read -s -n 1 key
+if [ "$key" = "" -o "$key" = "y" ]; then
+    sed -i 's/DROP/REJECT/g' "${RULES}" &>/dev/null
+    echo -e " ye shall be reject'd\n"
+else
+    sed -i 's/REJECT/DROP/g' "${RULES}" &>/dev/null
+    echo -e " gettin' dropped like a box of rocks\n"
 fi
 
 bash "${RULES}"
