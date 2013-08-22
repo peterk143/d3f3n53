@@ -9,41 +9,38 @@ fi
 ## delete existing rules
 iptables --flush
 
-## new chain to log and drop packets
-iptables -N LOGnDROP
-iptables -A INPUT -j LOGnDROP
-iptables -A LOGnDROP -j LOG -m limit --limit 5/min \
-    --log-prefix 'BitchAss Packed Dropped: ' --log-level 7
-iptables -A LOGnDROP -j DROP
-
 # BLOCK_THIS_IP="x.x.x.x"
 # iptables -A INPUT -s "${BLOCK_THIS_IP}" -j DROP
 
-## prevent DoS attack
-# iptables -A INPUT -i eth0 -p tcp -m multiport --dports \
-#     22,80,443 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
+## allow established connections
+# iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 ## allow loopback access
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A OUTPUT -o lo -j ACCEPT
 
-## allow all incoming SSH, HTTP, HTTPS
-iptables -A INPUT -i eth0 -p tcp -m multiport --dports \
-    22,80,443 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports \
-    22,80,443 -m state --state ESTABLISHED -j ACCEPT
+## allow all incoming HTTP/HTTPS
+# iptables -A INPUT -i eth0 -p tcp -m multiport --dports \
+#     80,443 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+# iptables -A OUTPUT -o eth0 -p tcp -m multiport --sports \
+#     80,443 -m state --state ESTABLISHED -j ACCEPT
 
-## allow all outgoing SSH, HTTP, HTTPS
-iptables -A OUTPUT -o eth0 -p tcp -m multiport --dports \
-    22,80,443 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A INPUT -i eth0 -p tcp -m multiport --sports \
-    22,80,443 -m state --state ESTABLISHED -j ACCEPT
+## allow all incoming SSH
+iptables -A INPUT -i eth0 -p tcp --dport 22 -m state \
+    --state NEW,ESTABLISHED,RELATED -j ACCEPT
 
 ## allow incoming SSH from specified
 # iptables -A INPUT -i eth0 -p tcp -s 71.61.223.37 \
 #     --dport 22 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 # iptables -A OUTPUT -o eth0 -p tcp --sport 22 -m state \
 #     --state ESTABLISHED -j ACCEPT
+
+## allow all outgoing SSH, HTTP, HTTPS
+iptables -A OUTPUT -o eth0 -p tcp -m multiport --dports \
+    22,80,443 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp -m multiport --sports \
+    22,80,443 -m state --state ESTABLISHED -j ACCEPT
 
 ## allow outgoing SSH to specified
 # iptables -A OUTPUT -o eth0 -p tcp -d 192.168.1.0/24 \
@@ -52,12 +49,12 @@ iptables -A INPUT -i eth0 -p tcp -m multiport --sports \
 #     --state ESTABLISHED -j ACCEPT
 
 ## allow ping from outside to inside
-iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
-iptables -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
+# iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+# iptables -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
 
 ## allow ping from inside to outside
-iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
-iptables -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
+# iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+# iptables -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
 
 ## allow outbound DNS
 # iptables -A OUTPUT -p udp -o eth0 --dport 53 -j ACCEPT
@@ -108,13 +105,24 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
 #     --state ESTABLISHED -j ACCEPT
 
 ## force SYN packet check
-iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+# iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
 
 ## force fragments packet check
-iptables -A INPUT -f -j DROP
+# iptables -A INPUT -f -j DROP
 
 ## drop incoming malformed XMAS packets
-iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+# iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP
 
 ## drop incoming malformed NULL packets
-iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+# iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+
+## new chain to log and drop packets
+# iptables -N LOGnDROP
+# iptables -A INPUT -j LOGnDROP
+# iptables -A LOGnDROP -j LOG -m limit --limit 5/min \
+#     --log-prefix 'BitchAss Packed Dropped: ' --log-level 7
+# iptables -A LOGnDROP -j DROP
+
+## prevent DoS attack
+# iptables -A INPUT -i eth0 -p tcp -m multiport --dports \
+#     22,80,443 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
