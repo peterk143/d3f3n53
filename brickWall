@@ -9,6 +9,10 @@ fi
 ## delete existing rules
 iptables --flush
 
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
 # BLOCK_THIS_IP="x.x.x.x"
 # iptables -A INPUT -s "${BLOCK_THIS_IP}" -j DROP
 
@@ -29,6 +33,7 @@ iptables -A OUTPUT -o lo -j ACCEPT
 ## allow all incoming SSH
 iptables -A INPUT -i eth0 -p tcp --dport 22 -m state \
     --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
 
 ## allow incoming SSH from specified
 # iptables -A INPUT -i eth0 -p tcp -s 71.61.223.37 \
